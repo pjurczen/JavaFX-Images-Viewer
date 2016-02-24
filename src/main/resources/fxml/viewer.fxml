@@ -7,16 +7,16 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.51" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.imagesViewer.controller.ImagesViewerController">
+<BorderPane fx:id="borderPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.51" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.imagesViewer.controller.ImagesViewerController">
    <center>
-      <ImageView fx:id="image" fitHeight="400.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+      <ImageView fx:id="imageView" fitHeight="400.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
    </center>
    <bottom>
       <HBox alignment="CENTER" prefHeight="50.0" prefWidth="400.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButtonAction" text="&lt;">
                <HBox.margin>
-                  <Insets right="25.0" />
+                  <Insets left="100.0" right="25.0" />
                </HBox.margin>
             </Button>
             <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playButtonAction" text="%button.play">
@@ -40,12 +40,12 @@
                   <Insets left="10.0" />
                </HBox.margin>
             </Button>
-            <Label fx:id="directoryLabel" text="%label.directory">
+            <Label text="%label.directory">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
             </Label>
-            <Label text="DirectoryPath" visible="false">
+            <Label fx:id="directoryLabel" text="DirectoryPath" visible="false">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
@@ -53,4 +53,14 @@
          </children>
       </HBox>
    </top>
+   <left>
+      <TableView fx:id="resultTable" prefHeight="400.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+        <placeholder>
+          <Label text="%table.emptyText" />
+        </placeholder>
+        <columns>
+          <TableColumn fx:id="imageColumn" prefWidth="100.0" text="%column.images" />
+        </columns>
+      </TableView>
+   </left>
 </BorderPane>

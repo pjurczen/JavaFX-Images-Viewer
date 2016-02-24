@@ -12,7 +12,7 @@ import javafx.collections.FXCollections;
 import pl.imagesViewer.dataProvider.data.ImageVO;
 
 public class FileModel {
-    private final StringProperty directory = new SimpleStringProperty();
+    private final StringProperty directory = new SimpleStringProperty("");
     private final ListProperty<ImageVO> result = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
 
     public final String getDirectory() {
