@@ -1,39 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import java.lang.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="borderPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.51" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.imagesViewer.controller.ImagesViewerController">
-   <center>
-      <ImageView fx:id="imageView" fitHeight="400.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
-   </center>
-   <bottom>
-      <HBox alignment="CENTER" prefHeight="50.0" prefWidth="400.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButtonAction" text="&lt;">
-               <HBox.margin>
-                  <Insets left="100.0" right="25.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playButtonAction" text="%button.play">
-               <HBox.margin>
-                  <Insets />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextButtonAction" text="&gt;">
-               <HBox.margin>
-                  <Insets left="25.0" />
-               </HBox.margin>
-            </Button>
-         </children>
-      </HBox>
-   </bottom>
-   <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+<GridPane fx:id="gridPane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.51" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.imagesViewer.controller.ImagesViewerController">
+  <columnConstraints>
+    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" valignment="CENTER" vgrow="NEVER" />
+    <RowConstraints minHeight="400.0" prefHeight="400.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" valignment="CENTER" vgrow="NEVER" />
+  </rowConstraints>
+   <children>
+      <HBox alignment="CENTER_LEFT" fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="200.0">
          <children>
             <Button fx:id="browseButton" mnemonicParsing="false" onAction="#browseButtonAction" text="%button.browse">
                <HBox.margin>
@@ -52,15 +35,30 @@
             </Label>
          </children>
       </HBox>
-   </top>
-   <left>
-      <TableView fx:id="resultTable" prefHeight="400.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-        <placeholder>
-          <Label text="%table.emptyText" />
-        </placeholder>
-        <columns>
-          <TableColumn fx:id="imageColumn" prefWidth="100.0" text="%column.images" />
-        </columns>
-      </TableView>
-   </left>
-</BorderPane>
+      <ImageView fx:id="imageView" fitHeight="400.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1" />
+      <VBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" prefWidth="100.0" GridPane.rowIndex="2">
+         <children>
+            <ListView fx:id="imagesList" editable="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" orientation="HORIZONTAL" prefHeight="100.0" prefWidth="400.0" visible="false" />
+            <HBox alignment="CENTER" fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="400.0">
+               <children>
+                  <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButtonAction" text="&lt;">
+                     <HBox.margin>
+                        <Insets right="25.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playButtonAction" text="%button.play">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextButtonAction" text="&gt;">
+                     <HBox.margin>
+                        <Insets left="25.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</GridPane>

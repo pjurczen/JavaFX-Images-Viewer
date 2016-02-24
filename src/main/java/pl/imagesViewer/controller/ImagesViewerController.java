@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -12,6 +11,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -20,9 +22,7 @@ import javafx.stage.DirectoryChooser;
 import pl.imagesViewer.dataProvider.DataProvider;
 import pl.imagesViewer.dataProvider.data.ImageVO;
 import pl.imagesViewer.model.FileModel;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 
 public class ImagesViewerController {
     
@@ -48,19 +48,17 @@ public class ImagesViewerController {
     private Label directoryLabel;
     
     @FXML
-    private TableView<ImageVO> resultTable;
+    private ListView<ImageVO> imagesList;
     
     @FXML
-    private TableColumn<ImageVO, String> imageColumn;
-    
-    @FXML
-    private BorderPane borderPane;
+    private GridPane gridPane;
     
     @FXML
     private void initialize() {
+        imageView.fitWidthProperty().bind(gridPane.widthProperty());
         installKeyHandlers();
-        initializeResultTable();
-        resultTable.itemsProperty().bind(model.resultProperty());
+        initializeImagesList();
+        imagesList.itemsProperty().bind(model.resultProperty());
     }
 
     @FXML
@@ -73,7 +71,7 @@ public class ImagesViewerController {
 
     @FXML
     public void nextButtonAction() {
-        resultTable.getSelectionModel().selectBelowCell();
+        imagesList.getSelectionModel().selectNext();
     }
 
     @FXML
@@ -83,11 +81,11 @@ public class ImagesViewerController {
 
     @FXML
     public void previousButtonAction() {
-        resultTable.getSelectionModel().selectAboveCell();
+        imagesList.getSelectionModel().selectPrevious();
     }
 
     private void installKeyHandlers() {
-        borderPane.setFocusTraversable(true);
+        gridPane.setFocusTraversable(true);
         final EventHandler<KeyEvent> previousKeyHandler = new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.LEFT) {
@@ -99,12 +97,30 @@ public class ImagesViewerController {
                 }
             }
         };
-        borderPane.setOnKeyPressed(previousKeyHandler);
+        gridPane.setOnKeyPressed(previousKeyHandler);
     }
 
-    private void initializeResultTable() {
-        imageColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getName()));
-        resultTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ImageVO>() {
+    private void initializeImagesList() {
+        imagesList.setCellFactory(listView -> new ListCell<ImageVO>() {
+            private final ImageView imageView = new ImageView();
+            {
+                imageView.setFitHeight(80);
+                imageView.setFitWidth(160);
+                imageView.setPreserveRatio(true);
+            }
+            @Override
+            public void updateItem(ImageVO image, boolean empty) {
+                super.updateItem(image, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    imageView.setImage(new Image("file:" + File.separator + image.getFullPath()));
+                    setGraphic(imageView);
+                }
+            }
+        });
+        imagesList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ImageVO>() {
             @Override
             public void changed(ObservableValue<? extends ImageVO> observable, ImageVO oldValue, ImageVO newValue) {
                 if (newValue == null)
@@ -127,7 +143,7 @@ public class ImagesViewerController {
                 @Override
                 protected void succeeded() {
                     model.setResult(getValue());
-                    resultTable.getSortOrder().clear();
+                    imagesList.setVisible(true);
                 }
             };
             new Thread(getImagesTask).start();
@@ -137,6 +153,7 @@ public class ImagesViewerController {
     private void updateDirectoryLabel() {
         if(model.getDirectory() != null) {
             directoryLabel.setText(model.getDirectory());
+            directoryLabel.setTooltip(new Tooltip(model.getDirectory()));
             directoryLabel.setVisible(true);
         }
     }
@@ -144,6 +161,6 @@ public class ImagesViewerController {
     private void selectDirectory() throws IOException {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File(".").getCanonicalFile());
-        model.setDirectory(directoryChooser.showDialog(resultTable.getScene().getWindow()).getAbsolutePath());
+        model.setDirectory(directoryChooser.showDialog(gridPane.getScene().getWindow()).getAbsolutePath());
     }
 }
