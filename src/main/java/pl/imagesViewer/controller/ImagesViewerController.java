@@ -3,10 +3,15 @@ package pl.imagesViewer.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.ResourceBundle;
 
+import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,15 +24,25 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.util.Duration;
 import pl.imagesViewer.dataProvider.DataProvider;
 import pl.imagesViewer.dataProvider.data.ImageVO;
 import pl.imagesViewer.model.FileModel;
 import javafx.scene.layout.GridPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.StackPane;
 
 public class ImagesViewerController {
     
     private final DataProvider dataProvider = DataProvider.INSTANCE;
     private FileModel model = new FileModel();
+    private Timeline timeline;
+    private AnimationTimer timer;
+    private boolean slideShowOn = false;
+    
+    
+    @FXML
+    private ResourceBundle resources;
     
     @FXML
     private ImageView imageView;
@@ -54,8 +69,13 @@ public class ImagesViewerController {
     private GridPane gridPane;
     
     @FXML
+    private ScrollPane scrollPane;
+    
+    @FXML
+    private StackPane imageHolder;
+    
+    @FXML
     private void initialize() {
-        imageView.fitWidthProperty().bind(gridPane.widthProperty());
         installKeyHandlers();
         initializeImagesList();
         imagesList.itemsProperty().bind(model.resultProperty());
@@ -65,8 +85,11 @@ public class ImagesViewerController {
     public void browseButtonAction() throws IOException {
         imageView.setImage(null);
         selectDirectory();
-        updateDirectoryLabel();
-        updateImagesList();
+        if(model.getDirectory() != null) {
+            updateDirectoryLabel();
+            updateImagesList();
+            enableButtons();
+        }
     }
 
     @FXML
@@ -76,7 +99,39 @@ public class ImagesViewerController {
 
     @FXML
     public void playButtonAction() {
-
+        if(!slideShowOn) {
+            slideShowOn = true;
+            timer = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                }
+            };
+            timeline = new Timeline();
+            timeline.setCycleCount(Timeline.INDEFINITE);
+            timeline.setAutoReverse(true);
+            
+            Duration duration = Duration.millis(2000);
+            
+            EventHandler<ActionEvent> onFinished = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent t) {
+                    if(imagesList.getSelectionModel().getSelectedItem() != null && !imagesList.getSelectionModel().isSelected(imagesList.getItems().size() - 1)) {
+                        imagesList.getSelectionModel().selectNext();
+                    } else {
+                        imagesList.getSelectionModel().selectFirst();
+                    }
+                }
+            };
+            KeyFrame keyFrame = new KeyFrame(duration, onFinished);
+            timeline.getKeyFrames().add(keyFrame);
+            
+            timeline.play();
+            timer.start();
+            playButton.setText(resources.getString("button.stop"));
+        } else {
+            timeline.stop();
+            timer.stop();
+            playButton.setText(resources.getString("button.play"));
+        }
     }
 
     @FXML
@@ -98,6 +153,12 @@ public class ImagesViewerController {
             }
         };
         gridPane.setOnKeyPressed(previousKeyHandler);
+    }
+
+    private void enableButtons() {
+        previousButton.setDisable(false);
+        nextButton.setDisable(false);
+        playButton.setDisable(false);
     }
 
     private void initializeImagesList() {
@@ -127,35 +188,33 @@ public class ImagesViewerController {
                     return;
                 Image image = new Image("file:" + File.separator + newValue.getFullPath());
                 imageView.setImage(image);
+                imageView.setFitWidth(image.getWidth());
+                imageView.setFitHeight(image.getHeight());
             }
         });
     }
 
     private void updateImagesList() {
-        if(model.getDirectory() != null) {
-            Task<Collection<ImageVO>> getImagesTask = new Task<Collection<ImageVO>>() {
+        Task<Collection<ImageVO>> getImagesTask = new Task<Collection<ImageVO>>() {
 
-                @Override
-                protected Collection<ImageVO> call() throws Exception {
-                    return dataProvider.getImages(model.getDirectory());
-                }
+            @Override
+            protected Collection<ImageVO> call() throws Exception {
+                return dataProvider.getImages(model.getDirectory());
+            }
 
-                @Override
-                protected void succeeded() {
-                    model.setResult(getValue());
-                    imagesList.setVisible(true);
-                }
-            };
-            new Thread(getImagesTask).start();
-        }
+            @Override
+            protected void succeeded() {
+                model.setResult(getValue());
+                imagesList.setVisible(true);
+            }
+        };
+        new Thread(getImagesTask).start();
     }
 
     private void updateDirectoryLabel() {
-        if(model.getDirectory() != null) {
-            directoryLabel.setText(model.getDirectory());
-            directoryLabel.setTooltip(new Tooltip(model.getDirectory()));
-            directoryLabel.setVisible(true);
-        }
+        directoryLabel.setText(model.getDirectory());
+        directoryLabel.setTooltip(new Tooltip(model.getDirectory()));
+        directoryLabel.setVisible(true);
     }
 
     private void selectDirectory() throws IOException {

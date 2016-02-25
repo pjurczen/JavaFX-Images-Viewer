@@ -35,23 +35,22 @@
             </Label>
          </children>
       </HBox>
-      <ImageView fx:id="imageView" fitHeight="400.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1" />
       <VBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" prefWidth="100.0" GridPane.rowIndex="2">
          <children>
             <ListView fx:id="imagesList" editable="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" orientation="HORIZONTAL" prefHeight="100.0" prefWidth="400.0" visible="false" />
             <HBox alignment="CENTER" fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" prefWidth="400.0">
                <children>
-                  <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButtonAction" text="&lt;">
+                  <Button fx:id="previousButton" disable="true" mnemonicParsing="false" onAction="#previousButtonAction" text="&lt;">
                      <HBox.margin>
                         <Insets right="25.0" />
                      </HBox.margin>
                   </Button>
-                  <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playButtonAction" text="%button.play">
+                  <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#playButtonAction" text="%button.play">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
                   </Button>
-                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextButtonAction" text="&gt;">
+                  <Button fx:id="nextButton" disable="true" mnemonicParsing="false" onAction="#nextButtonAction" text="&gt;">
                      <HBox.margin>
                         <Insets left="25.0" />
                      </HBox.margin>
@@ -60,5 +59,14 @@
             </HBox>
          </children>
       </VBox>
+      <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefHeight="400.0" prefWidth="400.0" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+         <content>
+            <StackPane fx:id="imageHolder" prefHeight="150.0" prefWidth="200.0">
+               <children>
+                  <ImageView fx:id="imageView" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
+               </children>
+            </StackPane>
+         </content>
+      </ScrollPane>
    </children>
 </GridPane>
