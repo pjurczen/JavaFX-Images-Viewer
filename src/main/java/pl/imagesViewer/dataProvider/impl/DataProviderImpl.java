@@ -20,9 +20,11 @@ public class DataProviderImpl implements DataProvider {
 
             @Override
             public boolean accept(File dir, String name) {
-                for (String extension : imagesExtensions)
-                    if (name.toLowerCase().endsWith(extension))
+                for (String extension : imagesExtensions) {
+                    if (name.toLowerCase().endsWith(extension)) {
                         return true;
+                    }
+                }
                 return false;
             }
         });

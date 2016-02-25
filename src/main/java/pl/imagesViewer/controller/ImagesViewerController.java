@@ -135,6 +135,7 @@ public class ImagesViewerController {
             timer.start();
             playButton.setText(resources.getString("button.stop"));
         } else {
+            slideShowOn = false;
             timeline.stop();
             timer.stop();
             playButton.setText(resources.getString("button.play"));
@@ -218,8 +219,9 @@ public class ImagesViewerController {
         imagesList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ImageVO>() {
             @Override
             public void changed(ObservableValue<? extends ImageVO> observable, ImageVO oldValue, ImageVO newValue) {
-                if (newValue == null)
+                if (newValue == null) {
                     return;
+                }
                 Image image = new Image("file:" + File.separator + newValue.getFullPath());
                 imageView.setImage(image);
                 imageView.setFitWidth(image.getWidth());
