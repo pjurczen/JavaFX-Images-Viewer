@@ -8,6 +8,10 @@ import java.util.ResourceBundle;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -23,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
 import pl.imagesViewer.dataProvider.DataProvider;
@@ -39,6 +44,7 @@ public class ImagesViewerController {
     private Timeline timeline;
     private AnimationTimer timer;
     private boolean slideShowOn = false;
+    private DoubleProperty zoomProperty;
     
     
     @FXML
@@ -84,8 +90,9 @@ public class ImagesViewerController {
     @FXML
     public void browseButtonAction() throws IOException {
         imageView.setImage(null);
+        zoomProperty = null;
         selectDirectory();
-        if(model.getDirectory() != null) {
+        if(model.getDirectory() != "") {
             updateDirectoryLabel();
             updateImagesList();
             enableButtons();
@@ -139,6 +146,33 @@ public class ImagesViewerController {
         imagesList.getSelectionModel().selectPrevious();
     }
 
+    private void initializeZoom() {
+        if(zoomProperty == null) {
+            zoomProperty = new SimpleDoubleProperty(200);
+            zoomProperty.addListener(new InvalidationListener() {
+                @Override
+                public void invalidated(Observable arg0) {
+                    imageView.setFitWidth(zoomProperty.get() * 4);
+                    imageView.setFitHeight(zoomProperty.get() * 3);
+                }
+            });
+            
+            scrollPane.addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
+                @Override
+                public void handle(ScrollEvent event) {
+                    try {
+                        if (event.getDeltaY() > 0) {
+                            zoomProperty.set(zoomProperty.get() * 1.1);
+                        } else if (event.getDeltaY() < 0) {
+                            zoomProperty.set(zoomProperty.get() / 1.1);
+                        }
+                    } catch (NullPointerException e) {
+                    }
+                }
+            });
+        }
+    }
+    
     private void installKeyHandlers() {
         gridPane.setFocusTraversable(true);
         final EventHandler<KeyEvent> previousKeyHandler = new EventHandler<KeyEvent>() {
@@ -190,6 +224,7 @@ public class ImagesViewerController {
                 imageView.setImage(image);
                 imageView.setFitWidth(image.getWidth());
                 imageView.setFitHeight(image.getHeight());
+                initializeZoom();
             }
         });
     }
@@ -220,6 +255,9 @@ public class ImagesViewerController {
     private void selectDirectory() throws IOException {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(new File(".").getCanonicalFile());
-        model.setDirectory(directoryChooser.showDialog(gridPane.getScene().getWindow()).getAbsolutePath());
+        try {
+            model.setDirectory(directoryChooser.showDialog(gridPane.getScene().getWindow()).getAbsolutePath());
+        } catch (NullPointerException e) {
+        }
     }
 }
